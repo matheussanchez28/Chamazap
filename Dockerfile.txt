@@ -1,0 +1,32 @@
+# Dockerfile para compilar e rodar a aplicação em contêiner
+FROM node:20-alpine AS builder
+
+WORKDIR /app
+
+# Copia arquivos de dependências
+COPY package.json ./
+RUN npm install
+
+# Copia o código fonte da aplicação
+COPY . .
+
+# Compila a aplicação (Vite no frontend + esbuild do server.ts)
+RUN npm run build
+
+# Estágio de Produção
+FROM node:20-alpine AS runner
+
+WORKDIR /app
+
+ENV NODE_ENV=production
+ENV PORT=3000
+
+COPY package.json ./
+RUN npm install --only=production
+
+# Copia os arquivos compilados do estágio builder
+COPY --from=builder /app/dist ./dist
+
+EXPOSE 3000
+
+CMD ["node", "dist/server.cjs"]

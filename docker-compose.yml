@@ -1,0 +1,13 @@
+version: '3.8'
+
+services:
+  wacrm-app:
+    build: .
+    container_name: wacrm_app
+    restart: always
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
